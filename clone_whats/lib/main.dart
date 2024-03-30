@@ -43,8 +43,9 @@ class _WhatsAppHomeState extends State<WhatsAppHome> {
   Future<void> loadUsers() async {
     try {
       String jsonString = await rootBundle.loadString('assets/users.json');
+      Map<String, dynamic> decodedJson = json.decode(jsonString);
       setState(() {
-        users = json.decode(jsonString)['users'];
+        users = List<Map<String, dynamic>>.from(decodedJson['users']);
       });
     } catch (e) {
       print('Erro ao carregar os dados do usuário: $e');
