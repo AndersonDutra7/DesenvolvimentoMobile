@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'home.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: LoginPage(),
+  ));
+}
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -6,24 +13,16 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        leading: Image.asset('lib/assets/logo.png'),
-      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              CircleAvatar(
-                radius: 80,
-                backgroundColor: Colors.blue[100],
-                child: const Icon(
-                  Icons.person,
-                  size: 80,
-                  color: Colors.blue,
-                ),
+              SizedBox(
+                width: 200,
+                height: 200,
+                child: Image.asset('lib/assets/logo.png'),
               ),
               const SizedBox(height: 20.0),
               SizedBox(
@@ -57,7 +56,10 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
-                  // Adicione a lógica de autenticação aqui
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[700],
@@ -82,10 +84,4 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
 }
