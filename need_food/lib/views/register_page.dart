@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:need_food/components/custom_text_field.dart';
-import 'package:need_food/views/login_page.dart';
-import 'login_page.dart'; // Importe a página de login aqui
 
 class RegistroPage extends StatelessWidget {
   const RegistroPage({super.key});
@@ -10,7 +8,7 @@ class RegistroPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registro'),
+        title: const Text(''),
       ),
       body: Center(
         child: Padding(
@@ -18,19 +16,24 @@ class RegistroPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('lib/assets/logo.png'),
+              Container(
+                width: 200,
+                height: 200,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  image: DecorationImage(
+                    image: AssetImage('lib/assets/logo.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
               const SizedBox(height: 20),
               const CustomTextField(
-                hintText: 'Nome de usuário',
+                hintText: '',
                 icon: Icons.person,
               ),
               const CustomTextField(
-                hintText: 'Senha',
-                icon: Icons.lock,
-                isPassword: true,
-              ),
-              const CustomTextField(
-                hintText: 'Confirme a senha',
+                hintText: '',
                 icon: Icons.lock,
                 isPassword: true,
               ),
@@ -39,21 +42,13 @@ class RegistroPage extends StatelessWidget {
                 onPressed: () {
                   // Implemente a lógica de registro aqui
                 },
-                child: const Text('Registrar'),
-              ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  // Navegue para a página de login quando clicar no link
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
-                },
-                child: const Text(
-                  'Já tem uma conta? Faça login aqui',
-                  style: TextStyle(color: Colors.blue),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
+                child: const Text('Registrar'),
               ),
             ],
           ),
