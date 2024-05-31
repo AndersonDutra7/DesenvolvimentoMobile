@@ -11,8 +11,8 @@ class CustomButtonAmbar extends StatelessWidget {
     required this.text,
     required this.height,
     // required this.width,
-    super.key,
-  });
+    Key? key, // Corrigindo o parâmetro key
+  }) : super(key: key); // Passando a chave para o construtor da classe pai
 
   @override
   Widget build(BuildContext context) {

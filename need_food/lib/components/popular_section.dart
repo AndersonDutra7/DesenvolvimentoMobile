@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'popular_card.dart';
 
 class PopularSection extends StatelessWidget {
-  const PopularSection({super.key});
+  const PopularSection({Key? key}) : super(key: key); // Corrigindo o construtor
 
   @override
   Widget build(BuildContext context) {

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'recommended_card.dart';
 
 class RecommendedSection extends StatelessWidget {
-  const RecommendedSection({super.key});
+  const RecommendedSection({Key? key})
+      : super(key: key); // Corrigindo o construtor
 
   @override
   Widget build(BuildContext context) {

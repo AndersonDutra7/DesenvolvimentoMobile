@@ -4,8 +4,11 @@ class RecommendedCard extends StatelessWidget {
   final String title;
   final String imageUrl;
 
-  const RecommendedCard(
-      {super.key, required this.title, required this.imageUrl});
+  const RecommendedCard({
+    Key? key, // Corrigindo o parâmetro key
+    required this.title,
+    required this.imageUrl,
+  }) : super(key: key); // Passando a chave para o construtor da classe pai
 
   @override
   Widget build(BuildContext context) {

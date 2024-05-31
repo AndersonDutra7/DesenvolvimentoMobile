@@ -6,7 +6,7 @@ import 'package:need_food/components/recommended_section.dart';
 import 'package:need_food/components/custom_bottom_nav_bar.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

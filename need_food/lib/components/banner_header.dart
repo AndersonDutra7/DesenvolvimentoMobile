@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BannerHeader extends StatelessWidget {
-  const BannerHeader({super.key});
+  const BannerHeader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

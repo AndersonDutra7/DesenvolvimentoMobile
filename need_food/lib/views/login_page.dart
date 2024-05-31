@@ -4,7 +4,7 @@ import 'package:need_food/components/custom_text_field.dart';
 import 'package:need_food/views/register_page.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class LoginPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RegistroPage(),
+                            builder: (context) => const RegisterPage(),
                           ),
                         );
                       },

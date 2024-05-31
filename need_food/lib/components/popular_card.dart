@@ -5,11 +5,12 @@ class PopularCard extends StatelessWidget {
   final String price;
   final String imageUrl;
 
-  const PopularCard(
-      {super.key,
-      required this.title,
-      required this.price,
-      required this.imageUrl});
+  const PopularCard({
+    Key? key, // Corrigindo o parâmetro key
+    required this.title,
+    required this.price,
+    required this.imageUrl,
+  }) : super(key: key); // Passando a chave para o construtor da classe pai
 
   @override
   Widget build(BuildContext context) {

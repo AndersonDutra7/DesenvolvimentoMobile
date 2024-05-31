@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'category_card.dart';
 
 class CategorySection extends StatelessWidget {
-  const CategorySection({super.key});
+  const CategorySection({Key? key})
+      : super(key: key); // Corrigindo o construtor
 
   @override
   Widget build(BuildContext context) {
