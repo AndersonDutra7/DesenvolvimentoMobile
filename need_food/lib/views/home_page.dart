@@ -22,16 +22,25 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: const Stack(
+      body: Stack(
         children: [
+          Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFF8B4513), // Cor de fundo marrom
+            ),
+          ),
           SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BannerHeader(),
-                CategorySection(),
-                PopularSection(),
-                RecommendedSection(),
+                Image.asset(
+                  'lib/assets/logo_small.png', // Caminho da imagem do logo
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                const CategorySection(),
+                const PopularSection(),
+                const RecommendedSection(),
               ],
             ),
           ),

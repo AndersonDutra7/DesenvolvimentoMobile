@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:need_food/components/custom_button_ambar.dart';
 import 'package:need_food/components/custom_text_field.dart';
 import 'package:need_food/views/register_page.dart';
+import 'package:need_food/views/home_page.dart'; // Importamos a HomePage para redirecionamento
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,6 +11,41 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double inputHeight = 40.0;
     double buttonWidth = MediaQuery.of(context).size.width * 0.8;
+
+    // Controladores para os campos de entrada
+    final TextEditingController usernameController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
+    Future<void> loginUser(BuildContext context) async {
+      // Implemente a lógica de login aqui
+      // Neste exemplo, estamos apenas verificando se o nome de usuário não está vazio
+      if (usernameController.text.isNotEmpty) {
+        // Se o login for bem-sucedido, redirecionamos para a HomePage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } else {
+        // Caso contrário, exibimos um pop-up informando que o nome de usuário ou senha está incorreto
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Erro"),
+              content: const Text("Nome de usuário ou senha incorretos."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -36,8 +72,10 @@ class LoginPage extends StatelessWidget {
                       ),
                       child: SizedBox(
                         width: buttonWidth,
-                        child: const CustomTextField(
-                          hintText: 'Nome de usuário',
+                        child: CustomTextField(
+                          controller: usernameController,
+                          hintText:
+                              'Nome de usuário', // Alteramos o texto do placeholder
                           icon: Icons.person,
                         ),
                       ),
@@ -50,7 +88,8 @@ class LoginPage extends StatelessWidget {
                       ),
                       child: SizedBox(
                         width: buttonWidth,
-                        child: const CustomTextField(
+                        child: CustomTextField(
+                          controller: passwordController,
                           hintText: 'Senha',
                           icon: Icons.lock,
                           isPassword: true,
@@ -62,7 +101,8 @@ class LoginPage extends StatelessWidget {
                     ),
                     CustomButtonAmbar(
                       onPressed: () {
-                        // Implemente a lógica de login aqui
+                        loginUser(
+                            context); // Chamamos a função loginUser ao pressionar o botão de login
                       },
                       text: 'Login',
                       height: inputHeight * 1.2,

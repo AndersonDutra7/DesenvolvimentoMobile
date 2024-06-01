@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:need_food/components/custom_button_ambar.dart';
 import 'package:need_food/components/custom_avatar.dart';
 import 'package:need_food/components/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -10,10 +11,80 @@ class RegisterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double buttonWidth = MediaQuery.of(context).size.width * 0.8;
 
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
+    Future<void> registerUser(BuildContext context) async {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Sucesso"),
+              content: const Text("Usuário registrado com sucesso."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Erro"),
+                content: const Text("A senha é muito fraca."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        } else if (e.code == 'email-already-in-use') {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Erro"),
+                content: const Text("Este e-mail já está em uso."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor:
-          const Color(0xFF8B4513), // Tom de marrom para o background
+      backgroundColor: const Color(0xFF8B4513),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -32,7 +103,8 @@ class RegisterPage extends StatelessWidget {
                 ),
                 child: SizedBox(
                   width: buttonWidth,
-                  child: const CustomTextField(
+                  child: CustomTextField(
+                    controller: nameController,
                     hintText: 'Nome completo',
                     icon: Icons.person,
                   ),
@@ -46,10 +118,10 @@ class RegisterPage extends StatelessWidget {
                 ),
                 child: SizedBox(
                   width: buttonWidth,
-                  child: const CustomTextField(
-                    hintText: 'Senha',
-                    icon: Icons.lock,
-                    isPassword: true,
+                  child: CustomTextField(
+                    controller: emailController,
+                    hintText: 'E-mail',
+                    icon: Icons.email,
                   ),
                 ),
               ),
@@ -61,8 +133,9 @@ class RegisterPage extends StatelessWidget {
                 ),
                 child: SizedBox(
                   width: buttonWidth,
-                  child: const CustomTextField(
-                    hintText: 'Confirme a senha',
+                  child: CustomTextField(
+                    controller: passwordController,
+                    hintText: 'Senha',
                     icon: Icons.lock,
                     isPassword: true,
                   ),
@@ -71,10 +144,53 @@ class RegisterPage extends StatelessWidget {
               const SizedBox(height: 20),
               CustomButtonAmbar(
                 onPressed: () {
-                  // Implemente a lógica de registro aqui
+                  if (nameController.text.length < 7 ||
+                      !nameController.text.contains(RegExp(r'[0-9]')) ||
+                      !nameController.text.contains(RegExp(r'[a-zA-Z]'))) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Erro"),
+                          content: const Text(
+                              "O nome deve ter pelo menos 7 caracteres e conter letras e números."),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else if (!RegExp(r'^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$')
+                      .hasMatch(emailController.text)) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Erro"),
+                          content:
+                              const Text("Por favor, insira um e-mail válido."),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    registerUser(context);
+                  }
                 },
                 text: 'Registrar',
-                height: 48.0, // Mantendo a altura do botão consistente
+                height: 48.0,
               ),
               const SizedBox(height: 10),
               GestureDetector(
