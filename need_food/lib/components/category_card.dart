@@ -17,9 +17,11 @@ class CategoryCard extends StatelessWidget {
       child: Container(
         width: 80,
         height: 100,
+        margin: const EdgeInsets.symmetric(
+            horizontal: 8.0), // Espaçamento horizontal entre os cards
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(imageUrl),
+            image: NetworkImage(imageUrl), // Usar NetworkImage para URLs
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(5),

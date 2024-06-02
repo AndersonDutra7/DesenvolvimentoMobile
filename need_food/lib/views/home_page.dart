@@ -12,13 +12,36 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NeedFood'),
+        backgroundColor: const Color(0xFF8B4513),
+        title: ClipRRect(
+          borderRadius: BorderRadius.circular(50.0),
+          child: Image.asset(
+            'lib/assets/logo.png',
+            height: 50,
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Implement search functionality here
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: IconButton(
+                icon: Transform.translate(
+                  offset:
+                      const Offset(0, -1), // Mover o ícone 1 pixel para cima
+                  child: const Icon(
+                    Icons.search,
+                    color: Color(0xFF8B4513),
+                  ),
+                ),
+                onPressed: () {
+                  // Implementar funcionalidade de busca aqui
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -26,21 +49,17 @@ class HomePage extends StatelessWidget {
         children: [
           Container(
             decoration: const BoxDecoration(
-              color: Color(0xFF8B4513), // Cor de fundo marrom
+              color: Colors.white, // Cor de fundo branca
             ),
           ),
-          SingleChildScrollView(
+          const SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
-                  'lib/assets/logo_small.png', // Caminho da imagem do logo
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                const CategorySection(),
-                const PopularSection(),
-                const RecommendedSection(),
+                BannerHeader(),
+                CategorySection(),
+                PopularSection(),
+                RecommendedSection(),
               ],
             ),
           ),
@@ -60,8 +79,10 @@ class HomePage extends StatelessWidget {
               borderRadius: BorderRadius.circular(
                   28.0), // Isso garante que ele seja redondo
             ),
-            child: const Icon(Icons.shopping_cart,
-                color: Color.fromARGB(255, 50, 48, 48)),
+            child: const Icon(
+              Icons.shopping_cart,
+              color: Color.fromARGB(255, 50, 48, 48),
+            ),
           ),
         ),
       ),
