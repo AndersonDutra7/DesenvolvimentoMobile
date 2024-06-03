@@ -13,12 +13,21 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF8B4513),
-        title: ClipRRect(
-          borderRadius: BorderRadius.circular(50.0),
-          child: Image.asset(
-            'lib/assets/logo.png',
-            height: 50,
-          ),
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(50.0),
+              child: Image.asset(
+                'lib/assets/logo.png',
+                height: 40,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Ralph & Teddy Lanches',
+              style: TextStyle(fontSize: 18),
+            ),
+          ],
         ),
         actions: [
           Padding(
@@ -30,8 +39,7 @@ class HomePage extends StatelessWidget {
               ),
               child: IconButton(
                 icon: Transform.translate(
-                  offset:
-                      const Offset(0, -1), // Mover o ícone 1 pixel para cima
+                  offset: const Offset(0, -1),
                   child: const Icon(
                     Icons.search,
                     color: Color(0xFF8B4513),
@@ -49,7 +57,7 @@ class HomePage extends StatelessWidget {
         children: [
           Container(
             decoration: const BoxDecoration(
-              color: Colors.white, // Cor de fundo branca
+              color: Colors.white,
             ),
           ),
           const SingleChildScrollView(
@@ -77,7 +85,8 @@ class HomePage extends StatelessWidget {
             elevation: 6,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(
-                  28.0), // Isso garante que ele seja redondo
+                28.0,
+              ),
             ),
             child: const Icon(
               Icons.shopping_cart,

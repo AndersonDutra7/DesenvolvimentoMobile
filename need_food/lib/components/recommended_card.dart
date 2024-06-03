@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:need_food/views/product_detail.dart';
 
 class RecommendedCard extends StatelessWidget {
   final String title;
   final String imageUrl;
 
   const RecommendedCard({
-    Key? key, // Corrigindo o parâmetro key
+    Key? key,
     required this.title,
     required this.imageUrl,
-  }) : super(key: key); // Passando a chave para o construtor da classe pai
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
-        // Navegar para a página do produto
-        print('Produto $title clicado');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(productName: title),
+          ),
+        );
       },
       child: Container(
         width: 160,
@@ -23,7 +28,7 @@ class RecommendedCard extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(imageUrl),
+            image: NetworkImage(imageUrl),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(10),
@@ -36,13 +41,7 @@ class RecommendedCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
+        child: const Center(),
       ),
     );
   }

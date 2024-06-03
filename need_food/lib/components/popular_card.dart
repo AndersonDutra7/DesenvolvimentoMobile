@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:need_food/views/product_detail.dart';
 
 class PopularCard extends StatelessWidget {
   final String title;
@@ -6,26 +7,30 @@ class PopularCard extends StatelessWidget {
   final String imageUrl;
 
   const PopularCard({
-    Key? key, // Corrigindo o parâmetro key
+    Key? key,
     required this.title,
     required this.price,
     required this.imageUrl,
-  }) : super(key: key); // Passando a chave para o construtor da classe pai
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navegar para a página do produto
-        print('Produto $title clicado');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(productName: title),
+          ),
+        );
       },
       child: Container(
-        width: 140,
+        width: 160,
         height: 200,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(imageUrl),
+            image: NetworkImage(imageUrl),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(10),
@@ -47,16 +52,19 @@ class PopularCard extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
               Text(
                 price,
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ],
           ),

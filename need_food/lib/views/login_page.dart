@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:need_food/components/custom_button_ambar.dart';
 import 'package:need_food/components/custom_text_field.dart';
 import 'package:need_food/views/register_page.dart';
-import 'package:need_food/views/home_page.dart'; // Importamos a HomePage para redirecionamento
+import 'package:need_food/views/home_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,30 +14,56 @@ class LoginPage extends StatelessWidget {
     double inputHeight = 40.0;
     double buttonWidth = MediaQuery.of(context).size.width * 0.8;
 
-    // Controladores para os campos de entrada
     final TextEditingController usernameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
     Future<void> loginUser(BuildContext context) async {
-      // Implemente a lógica de login aqui
-      // Neste exemplo, estamos apenas verificando se o nome de usuário não está vazio
-      if (usernameController.text.isNotEmpty) {
-        // Se o login for bem-sucedido, redirecionamos para a HomePage
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isEqualTo: usernameController.text)
+            .get();
+
+        if (querySnapshot.docs.isEmpty) {
+          throw FirebaseAuthException(
+            code: 'user-not-found',
+            message: 'Usuário não encontrado.',
+          );
+        }
+
+        String email = querySnapshot.docs.first['email'];
+
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: passwordController.text,
+        );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
-      } else {
-        // Caso contrário, exibimos um pop-up informando que o nome de usuário ou senha está incorreto
+      } on FirebaseAuthException catch (e) {
+        String errorMessage;
+        if (e.code == 'user-not-found') {
+          errorMessage = 'Usuário ou senha inválidos.';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Usuário ou senha inválidos.';
+        } else {
+          errorMessage = 'Erro ao fazer login. Por favor, tente novamente.';
+        }
+
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text("Erro"),
-              content: const Text("Nome de usuário ou senha incorretos."),
+              content: Text(errorMessage),
               actions: [
                 TextButton(
                   onPressed: () {
+                    usernameController.clear();
+                    passwordController.clear();
                     Navigator.of(context).pop();
                   },
                   child: const Text("OK"),
@@ -74,8 +102,7 @@ class LoginPage extends StatelessWidget {
                         width: buttonWidth,
                         child: CustomTextField(
                           controller: usernameController,
-                          hintText:
-                              'Nome de usuário', // Alteramos o texto do placeholder
+                          hintText: 'Nome de usuário',
                           icon: Icons.person,
                         ),
                       ),
@@ -96,13 +123,10 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     CustomButtonAmbar(
                       onPressed: () {
-                        loginUser(
-                            context); // Chamamos a função loginUser ao pressionar o botão de login
+                        loginUser(context);
                       },
                       text: 'Login',
                       height: inputHeight * 1.2,

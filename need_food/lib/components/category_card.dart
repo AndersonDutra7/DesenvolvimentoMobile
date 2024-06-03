@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:need_food/views/categories_page.dart';
 
 class CategoryCard extends StatelessWidget {
   final String title;
@@ -9,19 +10,22 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
-        // Navegar para a página da categoria
-        print('Categoria $title clicada');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CategoryPage(categoryTitle: title),
+          ),
+        );
       },
       child: Container(
-        width: 80,
+        width: 100,
         height: 100,
-        margin: const EdgeInsets.symmetric(
-            horizontal: 8.0), // Espaçamento horizontal entre os cards
+        margin: const EdgeInsets.symmetric(horizontal: 8.0),
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(imageUrl), // Usar NetworkImage para URLs
+            image: NetworkImage(imageUrl),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(5),

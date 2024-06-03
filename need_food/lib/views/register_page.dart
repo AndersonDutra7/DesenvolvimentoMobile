@@ -3,6 +3,7 @@ import 'package:need_food/components/custom_button_ambar.dart';
 import 'package:need_food/components/custom_avatar.dart';
 import 'package:need_food/components/custom_text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -20,6 +21,14 @@ class RegisterPage extends StatelessWidget {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: emailController.text, password: passwordController.text);
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .set({
+          'username': nameController.text,
+          'email': emailController.text,
+        });
 
         showDialog(
           context: context,
@@ -105,7 +114,7 @@ class RegisterPage extends StatelessWidget {
                   width: buttonWidth,
                   child: CustomTextField(
                     controller: nameController,
-                    hintText: 'Nome completo',
+                    hintText: 'Nome de usuário',
                     icon: Icons.person,
                   ),
                 ),

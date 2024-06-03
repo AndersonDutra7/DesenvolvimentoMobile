@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'popular_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:need_food/components/popular_card.dart';
 
 class PopularSection extends StatelessWidget {
-  const PopularSection({Key? key}) : super(key: key); // Corrigindo o construtor
+  const PopularSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,19 +17,32 @@ class PopularSection extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return PopularCard(
-                  title: 'Product ${index + 1}',
-                  price: '\$${(index + 1) * 5}',
-                  imageUrl: 'assets/product${index + 1}.jpg',
-                );
-              },
-            ),
+          StreamBuilder<QuerySnapshot>(
+            stream:
+                FirebaseFirestore.instance.collection('products').snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              var popularItems = snapshot.data!.docs.take(4).toList();
+
+              return SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: popularItems.length,
+                  itemBuilder: (context, index) {
+                    var product = popularItems[index];
+                    var data = product.data() as Map<String, dynamic>;
+                    return PopularCard(
+                      title: data['nome'],
+                      price: data['valor'],
+                      imageUrl: data['imageUrl'],
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),
