@@ -18,26 +18,30 @@ class RecommendedSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('products')
-                .where('nome', whereIn: [
-              'Especial da Casa Duas Pessoas',
-              'X Bacon Aberto'
-            ]).snapshots(),
+            stream:
+                FirebaseFirestore.instance.collection('products').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
-              var recommendedItems = snapshot.data!.docs;
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: recommendedItems.map((doc) {
-                  var data = doc.data() as Map<String, dynamic>;
-                  return RecommendedCard(
-                    title: data['nome'],
-                    imageUrl: data['imageUrl'],
-                  );
-                }).toList(),
+              var recommendedItems = snapshot.data!.docs.take(2).toList();
+
+              return SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recommendedItems.length,
+                  itemBuilder: (context, index) {
+                    var product = recommendedItems[index];
+                    var data = product.data() as Map<String, dynamic>;
+                    return RecommendedCard(
+                      productId: product.id,
+                      title: data['nome'],
+                      price: data['valor'],
+                      imageUrl: data['imageUrl'],
+                    );
+                  },
+                ),
               );
             },
           ),

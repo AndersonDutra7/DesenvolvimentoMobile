@@ -26,7 +26,7 @@ class CategorySection extends StatelessWidget {
               }
               var categories = snapshot.data!.docs;
               return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.center, // Alteração aqui
                 children: [
                   for (var doc in categories)
                     CategoryCard(

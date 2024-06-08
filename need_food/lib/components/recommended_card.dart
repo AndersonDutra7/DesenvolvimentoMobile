@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:need_food/views/product_detail.dart';
+import 'package:need_food/views/product_details_page.dart';
 
 class RecommendedCard extends StatelessWidget {
+  final String productId;
   final String title;
   final String imageUrl;
+  final String price;
 
   const RecommendedCard({
     Key? key,
+    required this.productId,
     required this.title,
     required this.imageUrl,
+    required this.price,
   }) : super(key: key);
 
   @override
@@ -18,7 +22,7 @@ class RecommendedCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(productName: title),
+            builder: (context) => ProductDetailsPage(productId: productId),
           ),
         );
       },
@@ -41,7 +45,17 @@ class RecommendedCard extends StatelessWidget {
             ),
           ],
         ),
-        child: const Center(),
+        child: Center(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
       ),
     );
   }

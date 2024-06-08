@@ -35,6 +35,7 @@ class PopularSection extends StatelessWidget {
                     var product = popularItems[index];
                     var data = product.data() as Map<String, dynamic>;
                     return PopularCard(
+                      productId: product.id,
                       title: data['nome'],
                       price: data['valor'],
                       imageUrl: data['imageUrl'],

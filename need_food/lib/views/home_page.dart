@@ -2,11 +2,79 @@ import 'package:flutter/material.dart';
 import 'package:need_food/components/banner_header.dart';
 import 'package:need_food/components/category_section.dart';
 import 'package:need_food/components/popular_section.dart';
+import 'package:need_food/components/popular_card.dart';
 import 'package:need_food/components/recommended_section.dart';
 import 'package:need_food/components/custom_bottom_nav_bar.dart';
+import 'package:need_food/views/product_details_page.dart';
+import 'package:need_food/views/search_results_page.dart';
+import 'package:need_food/views/favorites_page.dart';
+import 'package:need_food/views/contact_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String searchQuery = '';
+  final ScrollController _scrollController = ScrollController();
+
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Buscar'),
+          content: TextField(
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value;
+              });
+            },
+            decoration:
+                const InputDecoration(hintText: 'Digite o nome do lanche'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (searchQuery.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          SearchResultsPage(searchQuery: searchQuery),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Buscar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _navigateToProfile() {
+    // Implemente a navegação para a página de edição de perfil
+  }
+
+  void _navigateToOrders() {
+    // Implemente a navegação para a página de pedidos
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +113,7 @@ class HomePage extends StatelessWidget {
                     color: Color(0xFF8B4513),
                   ),
                 ),
-                onPressed: () {
-                  // Implementar funcionalidade de busca aqui
-                },
+                onPressed: _showSearchDialog,
               ),
             ),
           ),
@@ -60,8 +126,9 @@ class HomePage extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          const SingleChildScrollView(
-            child: Column(
+          SingleChildScrollView(
+            controller: _scrollController,
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BannerHeader(),
@@ -73,30 +140,49 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 28.0),
-          child: FloatingActionButton(
-            onPressed: () {
-              // Navegar para a página do carrinho
-            },
-            backgroundColor: Colors.white,
-            elevation: 6,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                28.0,
-              ),
-            ),
-            child: const Icon(
-              Icons.shopping_cart,
-              color: Color.fromARGB(255, 50, 48, 48),
-            ),
-          ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToOrders,
+        backgroundColor: Colors.white,
+        child: const Icon(
+          Icons.shopping_cart,
+          color: Color.fromARGB(255, 50, 48, 48),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const CustomBottomNavBar(),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.home),
+                Text('Home'),
+              ],
+            ),
+            const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.favorite),
+                Text('Favorites'),
+              ],
+            ),
+            const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.message),
+                Text('Feedback'),
+              ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.person),
+              onPressed: _navigateToProfile,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
