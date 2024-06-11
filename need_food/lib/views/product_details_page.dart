@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:need_food/components/custom_bottom_nav_bar.dart';
+import 'package:need_food/views/favorites_page.dart';
+import 'package:need_food/views/feedback_page.dart';
+import 'package:need_food/views/profile_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productId;
@@ -156,19 +160,48 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         // Implemente a ação de iniciar um chat no WhatsApp
                       },
                       icon: const Icon(Icons.chat),
-                      label: const Text('Feedback'),
+                      label: const Text(
+                        'Feedback',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     ElevatedButton.icon(
                       onPressed: () {
                         // Implemente a ação de adicionar ao carrinho
                       },
                       icon: const Icon(Icons.shopping_cart),
-                      label: const Text('Pedido'),
+                      label: const Text(
+                        'Pedido',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
+          );
+        },
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        onHomeTap: () {
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        },
+        onFavoritesTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FavoritesPage()),
+          );
+        },
+        onFeedbackTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FeedbackPage()),
+          );
+        },
+        onProfileTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
           );
         },
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:need_food/views/login_page.dart';
+import 'package:need_food/views/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:need_food/services/firebase_options.dart';
 
@@ -22,7 +23,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
+        // outras rotas
+      },
     );
   }
 }

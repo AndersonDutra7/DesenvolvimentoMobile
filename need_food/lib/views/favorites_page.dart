@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:need_food/components/popular_card.dart';
+import 'package:need_food/components/custom_bottom_nav_bar.dart';
+import 'package:need_food/views/orders_page.dart';
+import 'package:need_food/views/profile_page.dart';
+import 'package:need_food/views/feedback_page.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({Key? key}) : super(key: key);
@@ -47,7 +51,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final userDoc =
         await FirebaseFirestore.instance.collection('users').doc(userId).get();
     List<dynamic> favoriteProducts = userDoc.get('favoriteProducts') ?? [];
-    // Filtra IDs inválidos (e.g., strings vazias)
     return favoriteProducts
         .cast<String>()
         .where((id) => id.isNotEmpty)
@@ -152,40 +155,86 @@ class _FavoritesPageState extends State<FavoritesPage> {
                             child: Text('Nenhum produto encontrado.'));
                       }
 
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: filteredItems.map((product) {
-                            var data = product.data() as Map<String, dynamic>;
+                      return ListView.builder(
+                        itemCount: filteredItems.length,
+                        itemBuilder: (context, index) {
+                          var product = filteredItems[index];
+                          var data = product.data() as Map<String, dynamic>;
 
-                            return GestureDetector(
-                              onTap: () {},
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Center(
-                                    child: SizedBox(
-                                      width: 160,
-                                      height: 200,
-                                      child: PopularCard(
-                                        productId: product.id,
-                                        title: data['nome'],
-                                        price: data['valor'],
-                                        imageUrl: data['imageUrl'],
-                                      ),
+                          String productName =
+                              data['nome'] ?? 'Nome não disponível';
+                          String productPrice =
+                              data['valor']?.toString() ?? '0.00';
+                          String productImageUrl =
+                              data['imageUrl'] ?? 'lib/assets/placeholder.png';
+
+                          return GestureDetector(
+                            onTap: () {},
+                            child: MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Center(
+                                  child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width - 32,
+                                    height: 200,
+                                    child: PopularCard(
+                                      productId: product.id,
+                                      title: productName,
+                                      price: productPrice,
+                                      imageUrl: productImageUrl,
                                     ),
                                   ),
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
+                            ),
+                          );
+                        },
                       );
                     },
                   );
                 },
               ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const OrdersPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.shopping_cart,
+          color: Color.fromARGB(255, 50, 48, 48),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CustomBottomNavBar(
+        onHomeTap: () {
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        },
+        onFavoritesTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FavoritesPage()),
+          );
+        },
+        onFeedbackTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FeedbackPage()),
+          );
+        },
+        onProfileTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
+        },
       ),
     );
   }

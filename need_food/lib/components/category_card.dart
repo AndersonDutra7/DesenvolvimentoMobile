@@ -20,8 +20,8 @@ class CategoryCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 100,
-        height: 100,
+        width: 85,
+        height: 85,
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -42,7 +42,7 @@ class CategoryCard extends StatelessWidget {
           child: Text(
             title,
             style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
           ),
         ),
       ),

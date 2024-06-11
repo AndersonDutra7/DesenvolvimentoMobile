@@ -15,6 +15,8 @@ class RegisterPage extends StatelessWidget {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+    final TextEditingController addressController = TextEditingController();
 
     Future<void> registerUser(BuildContext context) async {
       try {
@@ -28,6 +30,10 @@ class RegisterPage extends StatelessWidget {
             .set({
           'username': nameController.text,
           'email': emailController.text,
+          'phone': phoneController.text,
+          'address': addressController.text,
+          'favoriteProducts':
+              [], // Adiciona o campo favoriteProducts como uma lista vazia
         });
 
         showDialog(
@@ -49,43 +55,31 @@ class RegisterPage extends StatelessWidget {
           },
         );
       } on FirebaseAuthException catch (e) {
+        String errorMessage;
         if (e.code == 'weak-password') {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Erro"),
-                content: const Text("A senha é muito fraca."),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("OK"),
-                  ),
-                ],
-              );
-            },
-          );
+          errorMessage = "A senha é muito fraca.";
         } else if (e.code == 'email-already-in-use') {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Erro"),
-                content: const Text("Este e-mail já está em uso."),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("OK"),
-                  ),
-                ],
-              );
-            },
-          );
+          errorMessage = "Este e-mail já está em uso.";
+        } else {
+          errorMessage = "Ocorreu um erro durante o registro.";
         }
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Erro"),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
       } catch (e) {
         print(e);
       }
@@ -131,6 +125,36 @@ class RegisterPage extends StatelessWidget {
                     controller: emailController,
                     hintText: 'E-mail',
                     icon: Icons.email,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: SizedBox(
+                  width: buttonWidth,
+                  child: CustomTextField(
+                    controller: phoneController,
+                    hintText: 'Telefone',
+                    icon: Icons.phone,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: SizedBox(
+                  width: buttonWidth,
+                  child: CustomTextField(
+                    controller: addressController,
+                    hintText: 'Endereço',
+                    icon: Icons.home,
                   ),
                 ),
               ),

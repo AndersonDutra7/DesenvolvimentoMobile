@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:need_food/components/popular_card.dart';
+import 'package:need_food/components/custom_bottom_nav_bar.dart';
+import 'package:need_food/views/orders_page.dart';
+import 'package:need_food/views/favorites_page.dart';
+import 'package:need_food/views/profile_page.dart';
+import 'package:need_food/views/feedback_page.dart';
 
 class CategoryPage extends StatefulWidget {
   final String categoryTitle;
@@ -75,7 +80,13 @@ class _CategoryPageState extends State<CategoryPage> {
               ),
             ),
             const SizedBox(width: 8),
-            Text(widget.categoryTitle),
+            Flexible(
+              child: Text(
+                widget.categoryTitle,
+                overflow: TextOverflow
+                    .ellipsis, // Trunca o texto se estiver muito longo
+              ),
+            ),
           ],
         ),
         centerTitle: true,
@@ -139,42 +150,84 @@ class _CategoryPageState extends State<CategoryPage> {
               return const Center(child: Text('Nenhum produto encontrado.'));
             }
 
-            return SingleChildScrollView(
-              child: Column(
-                children: filteredItems.map((product) {
-                  var data = product.data() as Map<String, dynamic>;
+            return ListView.builder(
+              itemCount: filteredItems.length,
+              itemBuilder: (context, index) {
+                var product = filteredItems[index];
+                var data = product.data() as Map<String, dynamic>;
 
-                  String productName = data['nome'] ?? 'Nome não disponível';
-                  String productPrice = data['valor']?.toString() ?? '0.00';
-                  String productImageUrl =
-                      data['imageUrl'] ?? 'lib/assets/placeholder.png';
+                String productName = data['nome'] ?? 'Nome não disponível';
+                String productPrice = data['valor']?.toString() ?? '0.00';
+                String productImageUrl =
+                    data['imageUrl'] ?? 'lib/assets/placeholder.png';
 
-                  return GestureDetector(
-                    onTap: () {},
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 160,
-                            height: 200,
-                            child: PopularCard(
-                              productId: product.id, // Passe o productId
-                              title: productName,
-                              price: productPrice,
-                              imageUrl: productImageUrl,
-                            ),
+                return GestureDetector(
+                  onTap: () {},
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Center(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width - 32,
+                          height: 200,
+                          child: PopularCard(
+                            productId: product.id,
+                            title: productName,
+                            price: productPrice,
+                            imageUrl: productImageUrl,
                           ),
                         ),
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
+                  ),
+                );
+              },
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Implemente a navegação para a página de pedidos
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const OrdersPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.shopping_cart,
+          color: Color.fromARGB(255, 50, 48, 48),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CustomBottomNavBar(
+        onHomeTap: () {
+          Navigator.pushNamedAndRemoveUntil(context, '/home',
+              (route) => false); // Isso é só um exemplo de navegação de volta
+        },
+        onFavoritesTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FavoritesPage()),
+          ); // Isso é só um exemplo de navegação de volta
+        },
+        onFeedbackTap: () {
+          // Implemente a navegação para a página de feedback
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FeedbackPage()),
+          );
+        },
+        onProfileTap: () {
+          // Implemente a navegação para a página de perfil
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
+        },
       ),
     );
   }

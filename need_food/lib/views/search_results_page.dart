@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:need_food/components/popular_card.dart';
+import 'package:need_food/components/custom_bottom_nav_bar.dart';
+import 'package:need_food/views/favorites_page.dart';
+import 'package:need_food/views/feedback_page.dart';
+import 'package:need_food/views/profile_page.dart';
+import 'package:need_food/views/orders_page.dart';
+import 'package:need_food/views/home_page.dart';
 
 class SearchResultsPage extends StatefulWidget {
   final String searchQuery;
@@ -15,12 +21,48 @@ class SearchResultsPage extends StatefulWidget {
 
 class _SearchResultsPageState extends State<SearchResultsPage> {
   late String userId;
+  late String searchQuery;
 
   @override
   void initState() {
     super.initState();
     final user = FirebaseAuth.instance.currentUser;
     userId = user != null ? user.uid : '';
+    searchQuery = widget.searchQuery;
+  }
+
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+  }
+
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Buscar'),
+          content: TextField(
+            onChanged: updateSearchQuery,
+            decoration:
+                const InputDecoration(hintText: 'Digite o nome do lanche'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  // Atualiza a pesquisa ao fechar o diálogo
+                  searchQuery = searchQuery;
+                });
+              },
+              child: const Text('Buscar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -54,63 +96,132 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: IconButton(
+                icon: Transform.translate(
+                  offset: const Offset(0, -1),
+                  child: const Icon(
+                    Icons.search,
+                    color: Color(0xFF8B4513),
+                  ),
+                ),
+                onPressed: _showSearchDialog,
+              ),
+            ),
+          ),
+        ],
       ),
-      body: FutureBuilder<QuerySnapshot>(
-        future: _fetchSearchResults(widget.searchQuery),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Nenhum produto encontrado.'));
-          } else {
-            final results = snapshot.data!.docs;
-            return SingleChildScrollView(
-              child: Column(
-                children: results.map((product) {
-                  var data = product.data() as Map<String, dynamic>;
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: _fetchSearchResults(searchQuery),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            var results = snapshot.data!.docs;
 
-                  String productName = data['nome'] ?? 'Nome não disponível';
-                  String productPrice = data['valor']?.toString() ?? '0.00';
-                  String productImageUrl =
-                      data['imageUrl'] ?? 'lib/assets/placeholder.png';
+            if (results.isEmpty) {
+              return const Center(child: Text('Nenhum produto encontrado.'));
+            }
 
-                  return GestureDetector(
-                    onTap: () {},
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Center(
-                          child: SizedBox(
-                            width: 160,
-                            height: 200,
-                            child: PopularCard(
-                              productId: product.id,
-                              title: productName,
-                              price: productPrice,
-                              imageUrl: productImageUrl,
-                            ),
+            return ListView.builder(
+              itemCount: results.length,
+              itemBuilder: (context, index) {
+                var product = results[index];
+                var data = product.data() as Map<String, dynamic>;
+
+                String productName = data['nome'] ?? 'Nome não disponível';
+                String productPrice = data['valor']?.toString() ?? '0.00';
+                String productImageUrl =
+                    data['imageUrl'] ?? 'lib/assets/placeholder.png';
+
+                return GestureDetector(
+                  onTap: () {
+                    // Adicionar navegação ou ação ao clicar no item
+                  },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Center(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width - 32,
+                          height: 200,
+                          child: PopularCard(
+                            productId: product.id,
+                            title: productName,
+                            price: productPrice,
+                            imageUrl: productImageUrl,
                           ),
                         ),
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
+                  ),
+                );
+              },
             );
-          }
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const OrdersPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.shopping_cart,
+          color: Color.fromARGB(255, 50, 48, 48),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: CustomBottomNavBar(
+        onHomeTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+          ); // Isso é só um exemplo de navegação de volta
+        },
+        onFavoritesTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FavoritesPage()),
+          ); // Isso é só um exemplo de navegação de volta
+        },
+        onFeedbackTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FeedbackPage()),
+          );
+        },
+        onProfileTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
         },
       ),
     );
   }
 
-  Future<QuerySnapshot> _fetchSearchResults(String query) async {
+  Stream<QuerySnapshot> _fetchSearchResults(String query) {
     return FirebaseFirestore.instance
         .collection('products')
         .where('nome', isGreaterThanOrEqualTo: query)
         .where('nome', isLessThanOrEqualTo: '$query\uf8ff')
-        .get();
+        .snapshots();
   }
 }

@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:need_food/components/banner_header.dart';
 import 'package:need_food/components/category_section.dart';
 import 'package:need_food/components/popular_section.dart';
-import 'package:need_food/components/popular_card.dart';
 import 'package:need_food/components/recommended_section.dart';
 import 'package:need_food/components/custom_bottom_nav_bar.dart';
-import 'package:need_food/views/product_details_page.dart';
-import 'package:need_food/views/search_results_page.dart';
 import 'package:need_food/views/favorites_page.dart';
-import 'package:need_food/views/contact_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:need_food/views/feedback_page.dart';
+import 'package:need_food/views/profile_page.dart';
+import 'package:need_food/views/orders_page.dart';
+import 'package:need_food/views/search_results_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -69,11 +67,39 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _navigateToProfile() {
-    // Implemente a navegação para a página de edição de perfil
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ProfilePage(),
+      ),
+    );
   }
 
   void _navigateToOrders() {
-    // Implemente a navegação para a página de pedidos
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OrdersPage(),
+      ),
+    );
+  }
+
+  void _navigateToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const FavoritesPage(),
+      ),
+    );
+  }
+
+  void _navigateToFeedback() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const FeedbackPage(),
+      ),
+    );
   }
 
   @override
@@ -143,45 +169,18 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToOrders,
         backgroundColor: Colors.white,
+        shape: const CircleBorder(),
         child: const Icon(
           Icons.shopping_cart,
           color: Color.fromARGB(255, 50, 48, 48),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.home),
-                Text('Home'),
-              ],
-            ),
-            const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.favorite),
-                Text('Favorites'),
-              ],
-            ),
-            const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.message),
-                Text('Feedback'),
-              ],
-            ),
-            IconButton(
-              icon: const Icon(Icons.person),
-              onPressed: _navigateToProfile,
-            ),
-          ],
-        ),
+      bottomNavigationBar: CustomBottomNavBar(
+        onHomeTap: _scrollToTop,
+        onFavoritesTap: _navigateToFavorites,
+        onFeedbackTap: _navigateToFeedback,
+        onProfileTap: _navigateToProfile,
       ),
     );
   }
