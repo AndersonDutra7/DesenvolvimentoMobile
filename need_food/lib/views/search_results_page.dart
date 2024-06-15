@@ -7,7 +7,6 @@ import 'package:need_food/views/favorites_page.dart';
 import 'package:need_food/views/feedback_page.dart';
 import 'package:need_food/views/profile_page.dart';
 import 'package:need_food/views/orders_page.dart';
-import 'package:need_food/views/home_page.dart';
 
 class SearchResultsPage extends StatefulWidget {
   final String searchQuery;
@@ -53,7 +52,6 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
-                  // Atualiza a pesquisa ao fechar o diálogo
                   searchQuery = searchQuery;
                 });
               },
@@ -146,9 +144,7 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
                     data['imageUrl'] ?? 'lib/assets/placeholder.png';
 
                 return GestureDetector(
-                  onTap: () {
-                    // Adicionar navegação ou ação ao clicar no item
-                  },
+                  onTap: () {},
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: Container(
@@ -190,16 +186,13 @@ class _SearchResultsPageState extends State<SearchResultsPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomNavBar(
         onHomeTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-          ); // Isso é só um exemplo de navegação de volta
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         },
         onFavoritesTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const FavoritesPage()),
-          ); // Isso é só um exemplo de navegação de volta
+          );
         },
         onFeedbackTap: () {
           Navigator.push(

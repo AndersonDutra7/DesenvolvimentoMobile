@@ -5,6 +5,7 @@ import 'package:need_food/components/custom_bottom_nav_bar.dart';
 import 'package:need_food/views/favorites_page.dart';
 import 'package:need_food/views/feedback_page.dart';
 import 'package:need_food/views/profile_page.dart';
+import 'package:need_food/views/orders_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final String productId;
@@ -18,6 +19,109 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFavorite();
+  }
+
+  Future<void> checkIfFavorite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      final favoriteProducts = userData.get('favoriteProducts') ?? [];
+      setState(() {
+        isFavorite = favoriteProducts.contains(widget.productId);
+      });
+    }
+  }
+
+  Future<void> toggleFavorite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get();
+
+    var favoriteProducts = userData.get('favoriteProducts') ?? [];
+    if (favoriteProducts.contains(widget.productId)) {
+      favoriteProducts.remove(widget.productId);
+    } else {
+      favoriteProducts.add(widget.productId);
+    }
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .update({'favoriteProducts': favoriteProducts});
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+  }
+
+  Future<void> addToCart() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final productDocRef = FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.productId);
+
+      final productDoc = await productDocRef.get();
+      if (productDoc.exists) {
+        final productData = productDoc.data() as Map<String, dynamic>;
+
+        final cartRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('cart');
+
+        final cartProductDoc = await cartRef.doc(widget.productId).get();
+        if (cartProductDoc.exists) {
+          await cartRef.doc(widget.productId).update({
+            'quantity': FieldValue.increment(1),
+          });
+        } else {
+          await cartRef.doc(widget.productId).set({
+            'productId': widget.productId,
+            'productName':
+                productData['nome'], // Adicione o nome do produto ao carrinho
+            'productPrice':
+                productData['valor'], // Adicione o preço do produto ao carrinho
+            'quantity': 1,
+          });
+        }
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Sucesso"),
+              content: const Text("Produto adicionado ao carrinho"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
+  Future<DocumentSnapshot> getProductDetails() async {
+    return await FirebaseFirestore.instance
+        .collection('products')
+        .doc(widget.productId)
+        .get();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +160,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             ),
             onPressed: () async {
               await toggleFavorite();
-              setState(() {
-                isFavorite = !isFavorite;
-              });
             },
           ),
         ],
@@ -157,22 +258,32 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   children: [
                     ElevatedButton.icon(
                       onPressed: () {
-                        // Implemente a ação de iniciar um chat no WhatsApp
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const FeedbackPage()),
+                        );
                       },
                       icon: const Icon(Icons.chat),
                       label: const Text(
                         'Feedback',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amberAccent[700],
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                     ElevatedButton.icon(
-                      onPressed: () {
-                        // Implemente a ação de adicionar ao carrinho
-                      },
+                      onPressed: addToCart,
                       icon: const Icon(Icons.shopping_cart),
                       label: const Text(
                         'Pedido',
                         style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amberAccent[700],
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ],
@@ -182,6 +293,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const OrdersPage()),
+          );
+        },
+        backgroundColor: Colors.white,
+        shape: const CircleBorder(),
+        child: const Icon(
+          Icons.shopping_cart,
+          color: Color.fromARGB(255, 50, 48, 48),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomNavBar(
         onHomeTap: () {
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
@@ -206,32 +332,5 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         },
       ),
     );
-  }
-
-  Future<DocumentSnapshot> getProductDetails() async {
-    return await FirebaseFirestore.instance
-        .collection('products')
-        .doc(widget.productId)
-        .get();
-  }
-
-  Future<void> toggleFavorite() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get();
-
-    var favoriteProducts = userData.get('favoriteProducts') ?? [];
-    if (favoriteProducts.contains(widget.productId)) {
-      favoriteProducts.remove(widget.productId);
-    } else {
-      favoriteProducts.add(widget.productId);
-    }
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .update({'favoriteProducts': favoriteProducts});
   }
 }

@@ -5,10 +5,10 @@ class CustomAvatar extends StatelessWidget {
   final double size;
 
   const CustomAvatar({
-    Key? key, // Corrigindo o parâmetro key
+    Key? key,
     required this.imagePath,
     this.size = 150.0,
-  }) : super(key: key); // Passando a chave para o construtor da classe pai
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

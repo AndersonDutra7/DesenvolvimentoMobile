@@ -4,15 +4,13 @@ class CustomButtonAmbar extends StatelessWidget {
   final VoidCallback onPressed;
   final String text;
   final double height;
-  // final double width;
 
   const CustomButtonAmbar({
     required this.onPressed,
     required this.text,
     required this.height,
-    // required this.width,
-    Key? key, // Corrigindo o parâmetro key
-  }) : super(key: key); // Passando a chave para o construtor da classe pai
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

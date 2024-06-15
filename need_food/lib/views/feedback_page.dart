@@ -19,7 +19,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Future<void> _submitFeedback(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance.collection('feedbacks').add({
+      await FirebaseFirestore.instance
+          .collection('feedbacks')
+          .doc(user.uid) // Use o UID do usuário como ID do documento
+          .set({
         'userId': user.uid,
         'timestamp': DateTime.now(),
         'message': _feedbackController.text,
@@ -86,12 +89,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return const Center(
-                      child: Text('Erro ao carregar os feedbacks'));
+                  return Center(
+                      child: Text(
+                          'Erro ao carregar os feedbacks: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(
-                      child: Text('Seu feedback aparecerá aqui'));
+                    child: Text('Seu feedback aparecerá aqui'),
+                  );
                 }
+
                 final feedbacks = snapshot.data!.docs;
                 return ListView.builder(
                   itemCount: feedbacks.length,

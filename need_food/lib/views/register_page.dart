@@ -32,8 +32,7 @@ class RegisterPage extends StatelessWidget {
           'email': emailController.text,
           'phone': phoneController.text,
           'address': addressController.text,
-          'favoriteProducts':
-              [], // Adiciona o campo favoriteProducts como uma lista vazia
+          'favoriteProducts': [],
         });
 
         showDialog(

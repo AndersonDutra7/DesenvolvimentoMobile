@@ -7,11 +7,11 @@ class FormFieldContainer extends StatelessWidget {
   final bool isPassword;
 
   const FormFieldContainer({
-    Key? key, // Corrigindo o parâmetro key
+    Key? key,
     required this.hintText,
     required this.icon,
     this.isPassword = false,
-  }) : super(key: key); // Passando a chave para o construtor da classe pai
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

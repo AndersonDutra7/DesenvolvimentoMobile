@@ -34,8 +34,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: SizedBox(
         height: 50.0,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(
-              maxWidth: 300), // Definindo a largura máxima do campo de entrada
+          constraints: const BoxConstraints(maxWidth: 300),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -45,10 +44,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 child: TextField(
                   controller: _controller,
                   obscureText: widget.isPassword,
-                  maxLength: 30, // Limitando o tamanho máximo do texto
+                  maxLength: 30,
                   decoration: InputDecoration(
                     hintText: widget.hintText,
-                    counterText: "", // Removendo o contador de caracteres
+                    counterText: "",
                     border: InputBorder.none,
                     focusedBorder: const UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.blue),
@@ -59,9 +58,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     contentPadding: const EdgeInsets.symmetric(vertical: 20.0),
                   ),
                   onChanged: (value) {
-                    setState(() {
-                      // Update the state here if needed
-                    });
+                    setState(() {});
                   },
                 ),
               ),

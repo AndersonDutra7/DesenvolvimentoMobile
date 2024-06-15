@@ -84,7 +84,7 @@ class _CategoryPageState extends State<CategoryPage> {
               child: Text(
                 widget.categoryTitle,
                 overflow: TextOverflow
-                    .ellipsis, // Trunca o texto se estiver muito longo
+                    .ellipsis,
               ),
             ),
           ],
@@ -189,7 +189,6 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Implemente a navegação para a página de pedidos
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const OrdersPage()),
@@ -206,23 +205,21 @@ class _CategoryPageState extends State<CategoryPage> {
       bottomNavigationBar: CustomBottomNavBar(
         onHomeTap: () {
           Navigator.pushNamedAndRemoveUntil(context, '/home',
-              (route) => false); // Isso é só um exemplo de navegação de volta
+              (route) => false);
         },
         onFavoritesTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const FavoritesPage()),
-          ); // Isso é só um exemplo de navegação de volta
+          );
         },
         onFeedbackTap: () {
-          // Implemente a navegação para a página de feedback
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const FeedbackPage()),
           );
         },
         onProfileTap: () {
-          // Implemente a navegação para a página de perfil
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ProfilePage()),
