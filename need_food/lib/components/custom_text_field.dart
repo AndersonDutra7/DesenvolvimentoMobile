@@ -5,6 +5,7 @@ class CustomTextField extends StatefulWidget {
   final IconData icon;
   final bool isPassword;
   final TextEditingController? controller;
+  final TextInputType? keyboardType; // Adicionando keyboardType como parâmetro
 
   const CustomTextField({
     Key? key,
@@ -12,6 +13,7 @@ class CustomTextField extends StatefulWidget {
     required this.icon,
     this.isPassword = false,
     this.controller,
+    this.keyboardType, // Recebendo keyboardType como opcional
   }) : super(key: key);
 
   @override
@@ -44,6 +46,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 child: TextField(
                   controller: _controller,
                   obscureText: widget.isPassword,
+                  keyboardType: widget.keyboardType, // Definindo keyboardType
                   maxLength: 30,
                   decoration: InputDecoration(
                     hintText: widget.hintText,
@@ -75,5 +78,28 @@ class _CustomTextFieldState extends State<CustomTextField> {
       _controller.dispose();
     }
     super.dispose();
+  }
+
+  // Função para validar se o campo está vazio
+  bool get isEmpty {
+    return _controller.text.isEmpty;
+  }
+
+  // Função para validar o campo de telefone
+  String validatePhone() {
+    String phone = _controller.text;
+    if (phone.isEmpty) {
+      return "Campo obrigatório";
+    }
+    // Remover caracteres não numéricos
+    String digits = phone.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 10 || digits.length > 11) {
+      return "Telefone inválido";
+    }
+    // Formatando para o padrão "48-999999999" com 8 ou 9 dígitos depois do hífen
+    String formattedPhone = digits.replaceFirstMapped(
+        RegExp(r'^(\d{2})(\d{4,5})(\d{4})$'),
+        (match) => '${match[1]}-${match[2]}-${match[3]}');
+    return formattedPhone;
   }
 }

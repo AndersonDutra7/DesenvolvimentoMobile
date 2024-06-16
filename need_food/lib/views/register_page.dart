@@ -18,7 +18,56 @@ class RegisterPage extends StatelessWidget {
     final TextEditingController phoneController = TextEditingController();
     final TextEditingController addressController = TextEditingController();
 
-    Future<void> registerUser(BuildContext context) async {
+    void registerUser(BuildContext context) async {
+      // Validando os campos
+      if (nameController.text.isEmpty ||
+          emailController.text.isEmpty ||
+          passwordController.text.isEmpty ||
+          phoneController.text.isEmpty ||
+          addressController.text.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Erro"),
+              content: const Text("Por favor, preencha todos os campos."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      // Validando o formato do telefone
+      String formattedPhone = RegisterPage.formatPhone(phoneController.text);
+      if (formattedPhone.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Erro"),
+              content: const Text("Telefone inválido. Insira apenas números."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
       try {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
@@ -30,9 +79,10 @@ class RegisterPage extends StatelessWidget {
             .set({
           'username': nameController.text,
           'email': emailController.text,
-          'phone': phoneController.text,
+          'phone': formattedPhone,
           'address': addressController.text,
           'favoriteProducts': [],
+          'cart': [],
         });
 
         showDialog(
@@ -139,6 +189,7 @@ class RegisterPage extends StatelessWidget {
                     controller: phoneController,
                     hintText: 'Telefone',
                     icon: Icons.phone,
+                    keyboardType: TextInputType.number,
                   ),
                 ),
               ),
@@ -176,50 +227,7 @@ class RegisterPage extends StatelessWidget {
               const SizedBox(height: 20),
               CustomButtonAmbar(
                 onPressed: () {
-                  if (nameController.text.length < 7 ||
-                      !nameController.text.contains(RegExp(r'[0-9]')) ||
-                      !nameController.text.contains(RegExp(r'[a-zA-Z]'))) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text("Erro"),
-                          content: const Text(
-                              "O nome deve ter pelo menos 7 caracteres e conter letras e números."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else if (!RegExp(r'^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$')
-                      .hasMatch(emailController.text)) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text("Erro"),
-                          content:
-                              const Text("Por favor, insira um e-mail válido."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    registerUser(context);
-                  }
+                  registerUser(context);
                 },
                 text: 'Registrar',
                 height: 48.0,
@@ -246,5 +254,19 @@ class RegisterPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Função estática para formatar o telefone
+  static String formatPhone(String phone) {
+    // Removendo caracteres não numéricos
+    String digits = phone.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 10 || digits.length > 11) {
+      return ''; // Retorna vazio se não estiver no formato esperado
+    }
+    // Formatando para o padrão "48-999999999" com 8 ou 9 dígitos depois do hífen
+    String formattedPhone = digits.replaceFirstMapped(
+        RegExp(r'^(\d{2})(\d{4,5})(\d{4})$'),
+        (match) => '${match[1]}-${match[2]}-${match[3]}');
+    return formattedPhone;
   }
 }

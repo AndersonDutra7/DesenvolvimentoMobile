@@ -74,44 +74,53 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       if (productDoc.exists) {
         final productData = productDoc.data() as Map<String, dynamic>;
 
-        final cartRef = FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('cart');
+        final userDocRef =
+            FirebaseFirestore.instance.collection('users').doc(user.uid);
 
-        final cartProductDoc = await cartRef.doc(widget.productId).get();
-        if (cartProductDoc.exists) {
-          await cartRef.doc(widget.productId).update({
-            'quantity': FieldValue.increment(1),
-          });
-        } else {
-          await cartRef.doc(widget.productId).set({
-            'productId': widget.productId,
-            'productName':
-                productData['nome'], // Adicione o nome do produto ao carrinho
-            'productPrice':
-                productData['valor'], // Adicione o preço do produto ao carrinho
-            'quantity': 1,
-          });
+        final userDoc = await userDocRef.get();
+        if (userDoc.exists) {
+          List<dynamic> cart = userDoc.data()?['cart'] ?? [];
+
+          bool productExists = false;
+
+          for (var item in cart) {
+            if (item['productId'] == widget.productId) {
+              item['quantity'] += 1;
+              productExists = true;
+              break;
+            }
+          }
+
+          if (!productExists) {
+            cart.add({
+              'productId': widget.productId,
+              'productName': productData['nome'],
+              'productPrice': productData['valor'],
+              'productImageUrl': productData['imageUrl'],
+              'quantity': 1,
+            });
+          }
+
+          await userDocRef.update({'cart': cart});
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Sucesso"),
+                content: const Text("Produto adicionado ao carrinho"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
         }
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Sucesso"),
-              content: const Text("Produto adicionado ao carrinho"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
       }
     }
   }

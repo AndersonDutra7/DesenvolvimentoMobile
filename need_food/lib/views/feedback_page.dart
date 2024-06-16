@@ -19,32 +19,49 @@ class _FeedbackPageState extends State<FeedbackPage> {
   Future<void> _submitFeedback(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance
-          .collection('feedbacks')
-          .doc(user.uid) // Use o UID do usuário como ID do documento
-          .set({
-        'userId': user.uid,
-        'timestamp': DateTime.now(),
-        'message': _feedbackController.text,
-      });
-      _feedbackController.clear();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Sucesso"),
-            content: const Text("Feedback enviado com sucesso!"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
+      final userId = user.uid;
+      final feedbackRef =
+          FirebaseFirestore.instance.collection('feedbacks').doc(userId);
+
+      final feedbackDoc = await feedbackRef.get();
+
+      if (feedbackDoc.exists) {
+        final List<dynamic> currentFeedbacks = feedbackDoc.get('feedbacks');
+        final List<Map<String, dynamic>> updatedFeedbacks =
+            List.from(currentFeedbacks);
+
+        updatedFeedbacks.add({
+          'message': _feedbackController.text,
+          'timestamp': DateTime.now(),
+        });
+
+        await feedbackRef.set({
+          'userId': userId,
+          'feedbacks': updatedFeedbacks,
+        });
+
+        _feedbackController.clear();
+
+        setState(() {});
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Sucesso"),
+              content: const Text("Feedback enviado com sucesso!"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -78,13 +95,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
+            child: FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
                   .collection('feedbacks')
-                  .where('userId',
-                      isEqualTo: FirebaseAuth.instance.currentUser?.uid)
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
+                  .doc(FirebaseAuth.instance.currentUser?.uid)
+                  .get(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -92,31 +107,37 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   return Center(
                       child: Text(
                           'Erro ao carregar os feedbacks: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                } else if (!snapshot.hasData || !snapshot.data!.exists) {
                   return const Center(
-                    child: Text('Seu feedback aparecerá aqui'),
-                  );
+                      child: Text('Seu feedback aparecerá aqui'));
                 }
 
-                final feedbacks = snapshot.data!.docs;
+                final feedbackData =
+                    snapshot.data!.data() as Map<String, dynamic>;
+                final feedbacks = feedbackData['feedbacks'] as List<dynamic>;
+
                 return ListView.builder(
                   itemCount: feedbacks.length,
                   itemBuilder: (context, index) {
-                    final feedback = feedbacks[index];
-                    final data = feedback.data() as Map<String, dynamic>;
-                    final message = data['message'] as String;
-                    final timestamp = data['timestamp'] as Timestamp;
+                    final feedback = feedbacks[index] as Map<String, dynamic>;
+                    final message = feedback['message'] as String;
+                    final timestamp = feedback['timestamp'] as Timestamp;
                     final dateTime = DateTime.fromMillisecondsSinceEpoch(
                         timestamp.seconds * 1000);
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        leading: const CircleAvatar(
-                          child: Icon(Icons.person),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        title: Text(message),
-                        subtitle: Text(
-                          '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}',
+                        child: ListTile(
+                          leading: const CircleAvatar(
+                            child: Icon(Icons.person),
+                          ),
+                          title: Text(message),
+                          subtitle: Text(
+                            '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}',
+                          ),
                         ),
                       ),
                     );

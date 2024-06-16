@@ -55,7 +55,6 @@ class _ProfilePageState extends State<ProfilePage> {
           .doc(user.uid)
           .update({
         'username': _nameController.text,
-        'email': _emailController.text,
         'phone': _phoneController.text,
         'address': _addressController.text,
       });
@@ -112,12 +111,16 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/login', (route) => false);
+            },
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -134,7 +137,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   TextField(
                     controller: _emailController,
                     decoration: const InputDecoration(labelText: 'Email'),
-                    enabled: _isEditing,
+                    enabled:
+                        false, // Definindo como false para desabilitar a edição
                   ),
                   const SizedBox(height: 8),
                   TextField(
