@@ -35,33 +35,42 @@ class _FeedbackPageState extends State<FeedbackPage> {
           'timestamp': DateTime.now(),
         });
 
-        await feedbackRef.set({
-          'userId': userId,
+        await feedbackRef.update({
           'feedbacks': updatedFeedbacks,
         });
-
-        _feedbackController.clear();
-
-        setState(() {});
-
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Sucesso"),
-              content: const Text("Feedback enviado com sucesso!"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
+      } else {
+        await feedbackRef.set({
+          'userId': userId,
+          'feedbacks': [
+            {
+              'message': _feedbackController.text,
+              'timestamp': DateTime.now(),
+            }
+          ],
+        });
       }
+
+      _feedbackController.clear();
+
+      setState(() {});
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Sucesso"),
+            content: const Text("Feedback enviado com sucesso!"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 

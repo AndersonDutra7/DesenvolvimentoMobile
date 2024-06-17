@@ -18,53 +18,87 @@ class RegisterPage extends StatelessWidget {
     final TextEditingController phoneController = TextEditingController();
     final TextEditingController addressController = TextEditingController();
 
+    void showErrorDialog(BuildContext context, String message) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Erro"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    Future<bool> isEmailInUse(String email) async {
+      try {
+        final result =
+            await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+        return result.isNotEmpty;
+      } catch (e) {
+        return false;
+      }
+    }
+
     void registerUser(BuildContext context) async {
-      // Validando os campos
-      if (nameController.text.isEmpty ||
-          emailController.text.isEmpty ||
-          passwordController.text.isEmpty ||
-          phoneController.text.isEmpty ||
-          addressController.text.isEmpty) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Erro"),
-              content: const Text("Por favor, preencha todos os campos."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
+      List<String> emptyFields = [
+        if (nameController.text.isEmpty) "Nome de usuário",
+        if (emailController.text.isEmpty) "E-mail",
+        if (passwordController.text.isEmpty) "Senha",
+        if (phoneController.text.isEmpty) "Telefone",
+        if (addressController.text.isEmpty) "Endereço"
+      ];
+
+      if (emptyFields.length >= 2) {
+        showErrorDialog(context, "Favor, preencher todos os campos.");
         return;
       }
 
-      // Validando o formato do telefone
-      String formattedPhone = RegisterPage.formatPhone(phoneController.text);
+      String username = nameController.text.trim();
+      if (username.replaceAll(' ', '').length < 7 ||
+          !RegExp(r'^[a-zA-Z0-9\s]+$').hasMatch(username)) {
+        showErrorDialog(context,
+            "Nome inválido. Favor preencher apenas com letras e números, no mínimo 7 caracteres! Espaços são permitidos.");
+        return;
+      }
+
+      String email = emailController.text;
+      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+        showErrorDialog(context, "Favor inserir um e-mail válido.");
+        return;
+      }
+
+      if (await isEmailInUse(email)) {
+        showErrorDialog(
+            context, "Este e-mail já está em uso. Favor informe outro.");
+        return;
+      }
+
+      String phone = phoneController.text;
+      String formattedPhone = formatPhone(phone);
       if (formattedPhone.isEmpty) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Erro"),
-              content: const Text("Telefone inválido. Insira apenas números."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
+        showErrorDialog(context,
+            "Telefone inválido.Favor digite somente números no padrão 99-99999.9999");
+        return;
+      }
+
+      String address = addressController.text;
+      String password = passwordController.text;
+      if (address.length < 10) {
+        showErrorDialog(context,
+            "Campo inválido. Favor, o campo endereço deve conter no mínimo 10 caracteres.");
+        if (password.length < 7) {
+          showErrorDialog(context,
+              "Campo inválido. Favor, o campo senha deve conter no mínimo 7 caracterese não pode conter espaços.");
+        }
         return;
       }
 
@@ -112,23 +146,7 @@ class RegisterPage extends StatelessWidget {
         } else {
           errorMessage = "Ocorreu um erro durante o registro.";
         }
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Erro"),
-              content: Text(errorMessage),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("OK"),
-                ),
-              ],
-            );
-          },
-        );
+        showErrorDialog(context, errorMessage);
       } catch (e) {
         print(e);
       }
@@ -256,16 +274,13 @@ class RegisterPage extends StatelessWidget {
     );
   }
 
-  // Função estática para formatar o telefone
   static String formatPhone(String phone) {
-    // Removendo caracteres não numéricos
     String digits = phone.replaceAll(RegExp(r'\D'), '');
-    if (digits.length < 10 || digits.length > 11) {
-      return ''; // Retorna vazio se não estiver no formato esperado
+    if (digits.length != 11) {
+      return '';
     }
-    // Formatando para o padrão "48-999999999" com 8 ou 9 dígitos depois do hífen
     String formattedPhone = digits.replaceFirstMapped(
-        RegExp(r'^(\d{2})(\d{4,5})(\d{4})$'),
+        RegExp(r'^(\d{2})(\d{5})(\d{4})$'),
         (match) => '${match[1]}-${match[2]}-${match[3]}');
     return formattedPhone;
   }

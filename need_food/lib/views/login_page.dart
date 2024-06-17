@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:need_food/components/custom_button_ambar.dart';
 import 'package:need_food/components/custom_text_field.dart';
 import 'package:need_food/views/register_page.dart';
@@ -14,28 +13,14 @@ class LoginPage extends StatelessWidget {
     double inputHeight = 40.0;
     double buttonWidth = MediaQuery.of(context).size.width * 0.8;
 
-    final TextEditingController usernameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
     Future<void> loginUser(BuildContext context) async {
       try {
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .where('username', isEqualTo: usernameController.text)
-            .get();
-
-        if (querySnapshot.docs.isEmpty) {
-          throw FirebaseAuthException(
-            code: 'user-not-found',
-            message: 'Usuário não encontrado.',
-          );
-        }
-
-        String email = querySnapshot.docs.first['email'];
-
         UserCredential userCredential =
             await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
+          email: emailController.text,
           password: passwordController.text,
         );
 
@@ -46,9 +31,9 @@ class LoginPage extends StatelessWidget {
       } on FirebaseAuthException catch (e) {
         String errorMessage;
         if (e.code == 'user-not-found') {
-          errorMessage = 'Usuário ou senha inválidos.';
+          errorMessage = 'E-mail ou senha inválidos.';
         } else if (e.code == 'wrong-password') {
-          errorMessage = 'Usuário ou senha inválidos.';
+          errorMessage = 'E-mail ou senha inválidos.';
         } else {
           errorMessage = 'Erro ao fazer login. Por favor, tente novamente.';
         }
@@ -62,7 +47,7 @@ class LoginPage extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () {
-                    usernameController.clear();
+                    emailController.clear();
                     passwordController.clear();
                     Navigator.of(context).pop();
                   },
@@ -101,9 +86,10 @@ class LoginPage extends StatelessWidget {
                       child: SizedBox(
                         width: buttonWidth,
                         child: CustomTextField(
-                          controller: usernameController,
-                          hintText: 'Nome de usuário',
-                          icon: Icons.person,
+                          controller: emailController,
+                          hintText: 'E-mail',
+                          icon: Icons.email,
+                          keyboardType: TextInputType.emailAddress,
                         ),
                       ),
                     ),
