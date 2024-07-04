@@ -17,6 +17,27 @@ class LoginPage extends StatelessWidget {
     final TextEditingController passwordController = TextEditingController();
 
     Future<void> loginUser(BuildContext context) async {
+      if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Erro"),
+              content: const Text('Por favor, preencha todos os campos.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
       try {
         UserCredential userCredential =
             await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -30,9 +51,9 @@ class LoginPage extends StatelessWidget {
         );
       } on FirebaseAuthException catch (e) {
         String errorMessage;
-        if (e.code == 'user-not-found') {
-          errorMessage = 'E-mail ou senha inválidos.';
-        } else if (e.code == 'wrong-password') {
+        if (e.code == 'invalid-email' ||
+            e.code == 'invalid-credential' ||
+            e.code == 'wrong-password') {
           errorMessage = 'E-mail ou senha inválidos.';
         } else {
           errorMessage = 'Erro ao fazer login. Por favor, tente novamente.';

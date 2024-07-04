@@ -57,7 +57,7 @@ class RegisterPage extends StatelessWidget {
         if (addressController.text.isEmpty) "Endereço"
       ];
 
-      if (emptyFields.length >= 2) {
+      if (emptyFields.isNotEmpty) {
         showErrorDialog(context, "Favor, preencher todos os campos.");
         return;
       }
