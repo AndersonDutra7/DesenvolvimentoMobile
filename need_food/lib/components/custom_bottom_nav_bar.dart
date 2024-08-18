@@ -34,54 +34,50 @@ class CustomBottomNavBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(
-              child: IconButton(
-                icon: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.home),
-                    Text('Home', style: TextStyle(fontSize: 10)),
-                  ],
-                ),
-                onPressed: onHomeTap,
-              ),
+            _buildIconButton(
+              icon: Icons.home,
+              label: 'Home',
+              onPressed: onHomeTap,
             ),
-            Expanded(
-              child: IconButton(
-                icon: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.favorite),
-                    Text('Favorites', style: TextStyle(fontSize: 10)),
-                  ],
-                ),
-                onPressed: onFavoritesTap,
-              ),
+            _buildIconButton(
+              icon: Icons.favorite,
+              label: 'Favoritos',
+              onPressed: onFavoritesTap,
             ),
             const Spacer(),
-            Expanded(
-              child: IconButton(
-                icon: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.message),
-                    Text('Feedback', style: TextStyle(fontSize: 10)),
-                  ],
-                ),
-                onPressed: onFeedbackTap,
-              ),
+            _buildIconButton(
+              icon: Icons.message,
+              label: 'Feedbacks',
+              onPressed: onFeedbackTap,
             ),
-            Expanded(
-              child: IconButton(
-                icon: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.person),
-                    Text('Profile', style: TextStyle(fontSize: 10)),
-                  ],
-                ),
-                onPressed: onProfileTap,
-              ),
+            _buildIconButton(
+              icon: Icons.person,
+              label: 'Profile',
+              onPressed: onProfileTap,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Expanded(
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 8),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

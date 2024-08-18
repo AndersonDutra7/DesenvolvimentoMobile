@@ -124,53 +124,55 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Nome'),
-                    enabled: _isEditing,
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    enabled:
-                        false, // Definindo como false para desabilitar a edição
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(labelText: 'Telefone'),
-                    enabled: _isEditing,
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(labelText: 'Endereço'),
-                    enabled: _isEditing,
-                  ),
-                  const SizedBox(height: 16),
-                  _isEditing
-                      ? ElevatedButton(
-                          onPressed: _updateUserProfile,
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.amberAccent[700],
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(labelText: 'Nome'),
+                      enabled: _isEditing,
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      enabled: false,
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _phoneController,
+                      decoration: const InputDecoration(labelText: 'Telefone'),
+                      enabled: _isEditing,
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _addressController,
+                      decoration: const InputDecoration(labelText: 'Endereço'),
+                      enabled: _isEditing,
+                    ),
+                    const SizedBox(height: 16),
+                    _isEditing
+                        ? ElevatedButton(
+                            onPressed: _updateUserProfile,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.amberAccent[700],
+                            ),
+                            child: const Text('Salvar'),
+                          )
+                        : ElevatedButton(
+                            onPressed: _enableEditing,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.amberAccent[700],
+                            ),
+                            child: const Text('Editar Perfil'),
                           ),
-                          child: const Text('Salvar'),
-                        )
-                      : ElevatedButton(
-                          onPressed: _enableEditing,
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.amberAccent[700],
-                          ),
-                          child: const Text('Editar Perfil'),
-                        ),
-                ],
+                  ],
+                ),
               ),
             ),
       floatingActionButton: FloatingActionButton(

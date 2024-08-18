@@ -19,13 +19,25 @@ class CustomButtonAmbar extends StatelessWidget {
       width: 200,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.amberAccent[700],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+            (states) {
+              if (states.contains(MaterialState.pressed)) {
+                return Colors.amberAccent[700] ?? Colors.amberAccent;
+              }
+              return Colors.amberAccent[700] ?? Colors.amberAccent;
+            },
+          ),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         ),
-        child: Text(text),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.black),
+        ),
       ),
     );
   }

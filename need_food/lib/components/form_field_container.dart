@@ -5,12 +5,14 @@ class FormFieldContainer extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final bool isPassword;
+  final TextEditingController controller;
 
   const FormFieldContainer({
     Key? key,
     required this.hintText,
     required this.icon,
     this.isPassword = false,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class FormFieldContainer extends StatelessWidget {
       child: SizedBox(
         width: buttonWidth,
         child: CustomTextField(
+          controller: controller,
           hintText: hintText,
           icon: icon,
           isPassword: isPassword,
